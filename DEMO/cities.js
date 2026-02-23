@@ -1,4 +1,4 @@
-const fs =require('fs'); //Va chercher la librairie fs
+const fs = require('fs'); //Va chercher la librairie fs
 
 
 //fonction de lecture de fichier

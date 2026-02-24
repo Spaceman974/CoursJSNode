@@ -1,9 +1,20 @@
 "use strict"
+//Gérer les chemins d'images
+const path = require("path");
 
+//Import d'express-validator, pour les regex
+const {body, validationResult} = require("express-validator");
 //Import d'express
 const express = require("express");
-const app = express();// créer une instance d'express
+// créer une instance d'express
+const app = express();
+// Dit à Nodemon regarder les fichiers '.ejs'
+app.set("view engine", "ejs");
+// Gère l'encodage url
+app.use(express.urlencoded({extended: true}));
 const port = 3000;
+//ou est-ce qu'on va chercher son image
+app.use(express.static("public"));
 
 
 //Middleware pour valider la requête, gérer authentification, les logs, etc.
@@ -24,8 +35,31 @@ const cities = ["Nantes", "Rennes", "Paris", "Lorient", "Bordeaux"];
 
 //récupération des données de cities.
 app.get('/cities', (req, res) => {
-    res.send(cities.join(', '))
+    // res.send(cities.join(', ')) (sans fichier ejs)
+    res.render("cities/index", {cities: cities}) //Pour lui dire que la variable cities est celle qu'on a déclaré juste avant
+    //et qu'on va l'envoyer dans le fichier index.ejs
 })
+
+//gestion d'envoi du formulaire
+app.post("/cities",
+    body('city') //Avant de push, on va vérifier que le corps de la requête correspond bien à ce qu'on attends
+        .isLength({min: 3, max: 255})
+        .withMessage("le nom de ville doit être compris entre 3 et 255 caractères"),
+    (req, res) => {
+        const errors = validationResult(req)//Est-ce qu'on a des messages d'erreur
+
+        //Si j'ai des erreurs, renvoie le fichier cities.ejs avec le message d'erreur
+        if (!errors.isEmpty()) {
+            return res.status(422).render('cities.ejs', {
+                errors: errors.array(),
+                cities: cities,
+                city: req.body.city
+            })
+        }
+        cities.push(req.body.city)//on va chercher l'input du form dans le corps de la requête, donc req.body
+        // le '.city' vient du name de l'input.
+        res.redirect("/cities") //Une fois le push fait, on rafraichit la page.
+    })
 
 
 //Récupération de l'id et d'une seule ville

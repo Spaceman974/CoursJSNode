@@ -12,6 +12,29 @@ const app = express();
 app.set("view engine", "ejs");
 // Gère l'encodage url
 app.use(express.urlencoded({extended: true}));
+
+//------------------------------------------------------------------------------
+//Import de la librairie UUID pour le hash d'ID
+const {v4: uuidv4} = require("uuid");
+//Import de la libraire MongoDB
+const {MongoClient} = require("mongodb");
+
+//Gestion de la connexion à la BDD : on dit qu'on veut du mongoDB, qu'on cherche l'adresse localhost et que le port est 27017
+const uri = "mongodb://localhost:27017/cities_app";
+//instanciation du client : permet d'intérroger MongoDB
+const client = new MongoClient(uri);
+//Base de donnée à atteindre : cities_app qu'on a créé préalablement dans MongoDB
+const db = client.db("cities_app")
+
+//Vérification de la connexion au lancement de l'app
+client.connect().then(
+    () => {
+        console.log("Connexion réussie")
+    }
+).catch((err) => {
+    console.log("Connexion échouée: ", err)
+})
+//-----------------------------------------------------------------------------
 const port = 3000;
 //ou est-ce qu'on va chercher son image
 app.use(express.static("public"));

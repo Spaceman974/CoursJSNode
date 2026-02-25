@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express-validator": "^7.3.1"
+  }
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+<h1><%= title %></h1>
+<p>Découvrez le nombre qui se cache ici en un minimum de tours !</p>
+
+
+<form action="/devine" method="post">
+
+    <img src="/images/qmark.jpg" alt="question mark" width="100">
+    <h2>Qui suis-je ?</h2>
+    <p>Quel nombre se cache derrière cette carte mystère</p>
+
+    <label for="devine"></label>
+    <input type="text" name="devine" id="devine" placeholder="Saisissez un nombre">
+    <div class="feedback-container">
+        <div class="text-danger">
+            <% if (typeof errors !== 'undefined' && errors.length > 0 && errors[0].msg !== "Bravo!"){ %> <%=
+                errors[0].msg %>
+            <% } %>
+        </div>
+        <div class="text-success">
+            <% if (typeof errors !== 'undefined' && errors.length > 0 && errors[0].msg === "Bravo!"){ %> <%=
+                errors[0].msg %>
+            <% } %>
+        </div>
+    </div>
+    <button>Valider</button>
+
+</form>
+
+
+</body>
+</html>

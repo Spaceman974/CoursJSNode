@@ -9,17 +9,15 @@
     <title>Document</title>
 </head>
 <body class="container">
-<h1>My cities</h1>
+<h1>Utilisateurs du site</h1>
 <ul>
-    <% countries.forEach((country) => { %>
+    <% personne.forEach((people) => { %>
         <li>
-            <a href="/countries/<%= country.uuid %>/cities"><%= country.name %></a>
+            Nom : <%= people.name %> ---
+            <a href="/personne/<%= people.role.uuid %>/roles">Role : <%= people.role.roleName %></a>
         </li>
     <% }) %>
 </ul>
-<!-- views/index.ejs -->
-<form method="post" action="/countries">
-    <%- include('_form') %>
-</form>
+
 </body>
 </html>

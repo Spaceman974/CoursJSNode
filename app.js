@@ -43,9 +43,118 @@ const Country = mongoose.model("Country", {
     ],
 });
 
+const Role = mongoose.model("Role", {
+    roleName: String,
+    uuid: String,
+    personne: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Personne"
+        }
+    ]
+})
+
+const Personne = mongoose.model("Personne", {
+    name: String,
+    uuid: String,
+    role: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role"
+    }]
+})
+
 async function database() {
     await Country.deleteMany();
     await City.deleteMany();
+    await Personne.deleteMany();
+    await Role.deleteMany();
+
+    const admin = new Role({
+        roleName: "admin",
+        uuid: uuidv4(),
+    })
+
+    const dev = new Role({
+        roleName: "dev",
+        uuid: uuidv4(),
+    })
+
+    const user = new Role({
+        roleName: "user",
+        uuid: uuidv4(),
+    })
+
+    const roger = new Personne({
+        name: "Roger",
+        uuid: uuidv4(),
+        role: user._id
+    })
+    await roger.save();
+
+    const bernard = new Personne({
+        name: "Bernard",
+        uuid: uuidv4(),
+        role: user._id
+    })
+    await bernard.save();
+
+    const jeanClaude = new Personne({
+        name: "Jean-Claude",
+        uuid: uuidv4(),
+        role: user._id
+    })
+    await jeanClaude.save();
+
+    const mael = new Personne({
+        name: "Mael",
+        uuid: uuidv4(),
+        role: dev._id
+    })
+    await mael.save();
+
+    const arthur = new Personne({
+        name: "Arthur",
+        uuid: uuidv4(),
+        role: dev._id
+    })
+    await arthur.save();
+
+    const baptiste = new Personne({
+        name: "Baptiste",
+        uuid: uuidv4(),
+        role: dev._id
+    })
+    await baptiste.save();
+
+    const david = new Personne({
+        name: "David",
+        uuid: uuidv4(),
+        role: dev._id
+    })
+    await david.save();
+
+    const kevin = new Personne({
+        name: "Kevin",
+        uuid: uuidv4(),
+        role: admin._id
+    })
+    await kevin.save();
+
+    const manuMacron = new Personne({
+        name: "Emmanuel Macron",
+        uuid: uuidv4(),
+        role: admin._id
+    })
+    await manuMacron.save();
+
+    admin.personne.push(manuMacron, kevin);
+    dev.personne.push(baptiste, arthur, mael, david);
+    user.personne.push(roger, bernard, jeanClaude);
+
+    await admin.save();
+    await user.save();
+    await dev.save();
+
     const france = new Country({
         name: "France",
         uuid: uuidv4(),
@@ -91,21 +200,21 @@ async function database() {
     await france.save();
 
 
-    await City.aggregate([
-        {
-            $lookup: {
-                from: "countries",
-                localField: "country",
-                foreignField: "_id",
-                as: "countryData",
-            },
-        },
-        {
-            $unwind: "$countryData",
-        },
-    ]).then((cities) => {
-        console.log("cities: ", cities);
-    });
+    // await City.aggregate([
+    //     {
+    //         $lookup: {
+    //             from: "countries",
+    //             localField: "country",
+    //             foreignField: "_id",
+    //             as: "countryData",
+    //         },
+    //     },
+    //     {
+    //         $unwind: "$countryData",
+    //     },
+    // ]).then((cities) => {
+    //     console.log("cities: ", cities);
+    // });
 }
 
 database();
@@ -135,6 +244,52 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
+app.get("/personne", async (req, res) => {
+    // Personne.find().then((personne) => {
+    //     res.render("personne/index", {personne: personne});
+    // })
+
+    await Personne.aggregate([
+        {
+            $lookup: {
+                from: "roles",
+                localField: "role",
+                foreignField: "_id",
+                as: "role",
+            }
+        },
+        {
+            $unwind: "$role"
+        },
+    ]).then((people) => {
+        res.render("personne/index", {personne: people});
+    })
+})
+
+app.get("/personne/:uuid/roles", async (req, res) => {
+    const role = await Role.findOne({uuid: req.params.uuid});
+    await Personne.aggregate([
+        {
+            $lookup: {
+                from: "roles",
+                localField: "role",
+                foreignField: "_id",
+                as: "role",
+            }
+        },
+        {
+            $unwind: "$role"
+        },
+        {
+            $match: {"role.uuid": req.params.uuid}
+        },
+
+    ]).then((personnes) => {
+        res.render('personne/roles', {role: role, personnes: personnes})
+    })
+})
+
+
 app.get("/cities", (req, res) => {
     City.find().then((cities) => {
         res.render("cities/index", {cities: cities});
@@ -147,17 +302,28 @@ app.get("/countries", async (req, res) => {
     });
 });
 
-app.get("/countries/uuid/cities", async (req, res) => {
+app.get("/countries/:uuid/cities", async (req, res) => {
+    const country = await Country.findOne({uuid: req.params.uuid});
     await City.aggregate([
         {
             $lookup: {
                 from: "countries",
                 localField: "country",
                 foreignField: "_id",
-                as: "countryData",
-            },
-        }
-    ])
+                as: "country",
+            }
+        },
+        {
+            $unwind: "$country"
+        },
+        {
+            $match: {"country.uuid": req.params.uuid}
+        },
+
+    ]).then((cities) => {
+        console.log("Countrycities :", cities)
+        res.render('countries/cities', {cities: cities, country: country})
+    });
 })
 
 app.post(

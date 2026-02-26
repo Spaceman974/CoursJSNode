@@ -89,6 +89,8 @@ async function database() {
     france.cities.push(toulouse);
     france.cities.push(rennes);
     await france.save();
+
+
     await City.aggregate([
         {
             $lookup: {
@@ -138,6 +140,25 @@ app.get("/cities", (req, res) => {
         res.render("cities/index", {cities: cities});
     });
 });
+
+app.get("/countries", async (req, res) => {
+    Country.find().then((countries) => {
+        res.render("countries/index", {countries: countries});
+    });
+});
+
+app.get("/countries/uuid/cities", async (req, res) => {
+    await City.aggregate([
+        {
+            $lookup: {
+                from: "countries",
+                localField: "country",
+                foreignField: "_id",
+                as: "countryData",
+            },
+        }
+    ])
+})
 
 app.post(
     "/cities",

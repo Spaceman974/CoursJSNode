@@ -1,0 +1,14 @@
+<div class="mb-3">
+    <label for="country" class="form-label">City</label>
+    <input type="text"
+           class="form-control <%= typeof errors !== 'undefined' && errors.length > 0 ?
+                   'is-invalid' : '' %>"
+           id="country" name="country"
+           value="<%= typeof country !== 'undefined' ? country.name : '' %>">
+    <div class="invalid-feedback">
+        <% if (typeof errors !== 'undefined' && errors.length > 0){ %> <%=
+            errors[0].msg %>
+        <% } %>
+    </div>
+</div>
+<button class="btn btn-primary" type="submit">Submit</button>

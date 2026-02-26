@@ -10,22 +10,16 @@
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 <body class="container">
-<h1 class="display-1">My cities</h1>
-<ul class="list-group mb-5 mt-5">
-    <% cities.forEach( (city) => { %>
-        <li class="list-group-item">
-            <a href="cities/<%= city.uuid %>">   <%= city.name %></a>
-        </li>
-    <% }) %>
-</ul>
+<h1 class="display-1"><%= city.name %></h1>
+<span><%= city.uuid %></span>
 
-<!-- Commentaire pour dire que la vue en dessous est séparée de celle d'au dessus-->
-<!-- views/index.ejs-->
-<form action="/cities" method="post">
-    <!--On appelle le contenu du formulaire-->
+<form action="/cities/<%= city.uuid %>/delete" method="post">
+    <button type="submit" class="btn btn-danger mt-3 mb-5">Supprimer</button>
+</form>
+
+<form class="mt-5" action="/cities/<%= city.uuid %>/update" method="post">
     <%- include('_form') %>
-
-    <button class="btn btn-primary" type="submit"> ajouter</button>
+    <button type="submit" class="btn btn-info mt-3">Modifier</button>
 </form>
 
 <%- include('_turbophoto') %>

@@ -1,0 +1,20 @@
+<!--Composant de formulaire pour pouvoir le réutiliser-->
+
+<div>
+    <label for="city" class="form-label"> </label>
+    <input class="form-control <%= typeof errors !== 'undefined' && errors.length > 0 ? 'is-invalid' : '' %>"
+           type="text"
+           name="city" id="city"
+           value="<%= typeof city !== 'undefined' ? city.name : '' %>" placeholder="Ajoutez une ville">
+
+
+    <!--Gestion des messages d'erreur en cas de non respect de regex-->
+    <div class="invalid-feedback">
+        <!-- Si mon tableau d'erreurs n'est pas vide-->
+        <% if (typeof errors !== "undefined" && errors.length > 0){ %>
+            <!-- afficher le premier message d'erreur -->
+            <%= errors[0].msg %>
+        <% } %>
+    </div>
+
+</div>

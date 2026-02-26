@@ -81,6 +81,7 @@ async function database() {
 
 
     await edimbourg.save();
+    await glasgow.save();
     ecosse.cities.push(edimbourg, glasgow);
     await ecosse.save();
 
